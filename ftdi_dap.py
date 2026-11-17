@@ -226,6 +226,10 @@ class DAPInterface(FtdiBatch):
     def reset(self) -> None:
         raise NotImplementedError()
 
+    @abstractmethod
+    def release_reset(self) -> None:
+        raise NotImplementedError()
+
 
 class MiniWigglerBatch(DAPInterface):
     # low byte
@@ -296,6 +300,10 @@ class MiniWigglerBatch(DAPInterface):
         self.append(MiniWigglerBatch.GPIOH_RESET)
         self.append(MiniWigglerBatch.GPIOL_NORMAL)
 
+    def release_reset(self) -> None:
+        # GPIOH_INPUT drives ACBUS1 (RESET) high again.
+        self.append(MiniWigglerBatch.GPIOH_INPUT)
+
 
 class TigardBatch(DAPInterface):
     # low byte
@@ -329,6 +337,9 @@ class TigardBatch(DAPInterface):
         self.append(b'\x80\x10\x3b')
         self.append(b'\x80\x30\x3b')
 
+    def release_reset(self) -> None:
+        self.append(b'\x80\x30\x3b')
+
 
 class DAPBatch:
     def __init__(self, interface: DAPInterface) -> None:
@@ -338,6 +349,7 @@ class DAPBatch:
         self.test_reset = interface.test_reset
         self.exec = interface.exec
         self.reset = interface.reset
+        self.release_reset = interface.release_reset
         self.mpsse_set_clk_divisor = interface.mpsse_set_clk_divisor
 
     def mpsse_set_clk_freq(self, freq: int, base: int = 30_000_000) -> None:
