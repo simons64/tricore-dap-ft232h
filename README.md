@@ -1,4 +1,6 @@
-# tricore-things
+# tricore-dap-ft232h
+
+Based on awesome work by https://github.com/epozzobon/tricore-things
 
 This repo contains some python utilities for working with the DAP OCD protocon found in Aurix Tricore processors.
 
